@@ -1,0 +1,12 @@
+demo_hf/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
