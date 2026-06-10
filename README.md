@@ -1,11 +1,21 @@
-# Spectral Progressive Diffusion
+# Spectral Progressive Diffusion for Efficient Image and Video Generation
 
-Official code for **Spectral Progressive Diffusion for Efficient Image and Video
-Generation**.
+#### [[Project Website]](https://howardxiao.ca/speed/) [[Paper]](https://arxiv.org/abs/2605.18736) [[Demo]](https://huggingface.co/spaces/howardhx/speed/)
 
-- Project page: https://howardxiao.ca/speed/
-- Paper: https://arxiv.org/abs/2605.18736
-- Flux.1-dev latent image generation demo on HuggingFace: https://huggingface.co/spaces/howardhx/speed/
+[Howard Xiao<sup>1</sup>](https://howardxiao.ca/), [Brian Chao<sup>1</sup>](https://bchao1.github.io/), [ Lior Yariv<sup>1</sup>](https://lioryariv.github.io/), [Gordon Wetzstein<sup>1</sup>](https://stanford.edu/~gordonwz/)
+<sup>1</sup>Stanford University 
+</br>
+Official code for **Spectral Progressive Diffusion for Efficient Image and Video Generation**.
+
+![plot](speed.jpeg)
+
+```
+@article{xiao2026spectral,
+  author    = {Xiao, Howard and Chao, Brian and Yariv, Lior and Wetzstein, Gordon},
+  title     = {Spectral Progressive Diffusion for Efficient Image and Video Generation},
+  year      = {2026},
+}
+```
 
 ## Codebase Structure
 
@@ -17,8 +27,8 @@ Generation**.
 - `comfyui/`: ComfyUI custom sampler.
 
 ## Setup
-
 1. Install dependencies:
+   We recommend using Python 3.11.0 to install the following dependencies. 
    ```bash
    pip install -r requirements.txt
    ```
