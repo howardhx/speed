@@ -21,3 +21,4 @@ imageio>=2.31
 imageio-ffmpeg>=0.4
 
 # PixelGen and WAN must be cloned separately and added via environment variables.
+# Additionally, please install the requirements from the source clones of PixelGen and WAN
