@@ -9,6 +9,7 @@ PyYAML>=6.0
 omegaconf>=2.3
 einops>=0.7
 Pillow>=10.0
+tqdm>=4.65
 
 # Latent image (FLUX.1-dev)
 diffusers>=0.30

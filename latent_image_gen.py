@@ -18,6 +18,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from tqdm.auto import tqdm
 
 from utils import (
     delta_optimal_transitions,
@@ -203,6 +204,7 @@ def generate(
     guidance: float,
     seed: int,
     device: str,
+    progress_desc: str | None = None,
 ) -> torch.Tensor:
     """Run the progressive resolution denoising loop and return the final
     full-resolution latent.
@@ -221,6 +223,8 @@ def generate(
     - guidance: FLUX guidance value (guidance-distilled, single pass).
     - seed: Base seed for noise and per-transition expansion.
     - device: Device the denoising runs on.
+    - progress_desc: If set, display a tqdm bar over the denoising steps with
+      this label.
 
     Returns:
     - The final full-resolution spatial latent ``[1, C, H_lat, W_lat]``.
@@ -258,6 +262,10 @@ def generate(
     stage_starts = [0] + transition_steps
     stage_ends = transition_steps + [n_steps]
 
+    bar = None
+    if progress_desc is not None:
+        bar = tqdm(total=n_steps, desc=progress_desc, leave=False)
+
     for stage, (start, end, s_stage) in enumerate(zip(stage_starts, stage_ends, scales)):
         h, w = _stage_dims(s_stage)
         img_ids = make_img_ids(h, w, device, torch.bfloat16)
@@ -277,6 +285,8 @@ def generate(
                 return_dict=False,
             )[0]
             x_packed = scheduler.step(v, t, x_packed, return_dict=False)[0]
+            if bar is not None:
+                bar.update(1)
 
         if stage + 1 < len(scales):
             s_next = scales[stage + 1]
@@ -300,6 +310,8 @@ def generate(
             LOG.info("  -> expand+align: t=%.4f r=%.4f  t_tilde=%.4f",
                      t_at_transition, s_next / s_stage, t_tilde)
 
+    if bar is not None:
+        bar.close()
     return unpack(x_packed, H_lat, W_lat)
 
 
@@ -339,6 +351,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--save_dir", type=str, required=True)
     p.add_argument("--device", type=str, default="cuda:0")
     p.add_argument("--verbose", action="store_true")
+    p.add_argument("--progress", action="store_true",
+                   help="Show a tqdm progress bar over the denoising steps.")
     p.add_argument(
         "--config", type=str,
         default=str(Path(__file__).with_name("configs.yaml")),
@@ -395,6 +409,7 @@ def main() -> None:
             transform=args.transform, H_lat=H_lat, W_lat=W_lat,
             C=C, n_steps=n_steps, guidance=guidance,
             seed=args.seed + p_idx, device=args.device,
+            progress_desc="denoising" if args.progress else None,
         )
         out_path = os.path.join(args.save_dir, f"p{p_idx:04d}.png")
 

@@ -22,6 +22,7 @@ import numpy as np
 import torch
 from omegaconf import OmegaConf
 from PIL import Image
+from tqdm.auto import tqdm
 
 from utils import (
     delta_optimal_transitions,
@@ -287,6 +288,7 @@ def generate(
     height: int, width: int,
     n_steps: int, guidance: float, timeshift: float,
     seed: int, device: str, trained_grid: int,
+    progress_desc: str | None = None,
 ) -> torch.Tensor:
     """Run the staged denoising loop in pixel space and return the final tensor.
 
@@ -305,6 +307,8 @@ def generate(
     - seed: Base seed for noise and per-transition expansion.
     - device: Device the denoising runs on.
     - trained_grid: Grid size the denoiser was trained at.
+    - progress_desc: If set, show a tqdm bar over the denoising steps with this
+      label; left ``None`` adds no bar.
 
     Returns:
     - The final full-resolution pixel-space tensor ``[1, 3, res, res]``.
@@ -335,6 +339,10 @@ def generate(
     stage_starts = [0] + transition_steps
     stage_ends = transition_steps + [n_steps]
 
+    bar = None
+    if progress_desc is not None:
+        bar = tqdm(total=n_steps, desc=progress_desc, leave=False)
+
     for stage, (start, end, s_stage) in enumerate(zip(stage_starts, stage_ends, scales)):
         res_stage = round(s_stage * res_full)
         LOG.info("stage %d:  %dx%d  steps [%d, %d)", stage + 1, res_stage, res_stage, start, end)
@@ -342,6 +350,8 @@ def generate(
             v = cfg_velocity(denoiser, x, t_cur, cond, uncond, guidance)
             x = x + v * dts[i]
             t_cur = t_cur + dts[i]
+            if bar is not None:
+                bar.update(1)
 
         if stage + 1 < len(scales):
             s_next = scales[stage + 1]
@@ -366,6 +376,8 @@ def generate(
             LOG.info("  -> expand+align: t=%.4f r=%.4f  t_tilde=%.4f",
                      t_at_transition, s_next / s_stage, t_tilde)
 
+    if bar is not None:
+        bar.close()
     return x
 
 
@@ -425,6 +437,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--save_dir", type=str, required=True)
     p.add_argument("--device", type=str, default="cuda:0")
     p.add_argument("--verbose", action="store_true")
+    p.add_argument("--progress", action="store_true",
+                   help="Show a tqdm progress bar over the denoising steps.")
     p.add_argument("--config", type=str,
                    default=str(Path(__file__).with_name("configs.yaml")))
     return p.parse_args()
@@ -480,6 +494,7 @@ def main() -> None:
             n_steps=n_steps, guidance=guidance, timeshift=timeshift,
             seed=args.seed + p_idx, device=args.device,
             trained_grid=trained_grid,
+            progress_desc="denoising" if args.progress else None,
         )
         out_path = os.path.join(args.save_dir, f"p{p_idx:04d}.png")
         decode_and_save(vae, samples, out_path)
