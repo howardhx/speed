@@ -19,7 +19,7 @@ Official code for **Spectral Progressive Diffusion for Efficient Image and Video
 
 ## Codebase Structure
 
-- `utils.py`: spectral expansion, timestep alignment, and transition scheduling.
+- `utils.py`: spectral expansion, timestep alignment, and resolution transition scheduling.
 - `configs.yaml`: checkpoint paths, power-spectrum coefficients, and model defaults.
 - `latent_image_gen.py`: training-free latent image generation with FLUX.1-dev.
 - `pixel_image_gen.py`: training-free pixel-space image generation with PixelGen.
