@@ -26,7 +26,7 @@ Official code for **Spectral Progressive Diffusion for Efficient Image and Video
 - `latent_image_gen.py`: training-free latent image generation with FLUX.1-dev.
 - `pixel_image_gen.py`: training-free pixel-space image generation with PixelGen.
 - `latent_video_gen.py`: training-free latent video generation with WAN 2.1.
-- `comfyui/`: ComfyUI custom SPEED sampler.
+- `comfyui/`: ComfyUI custom SPEED sampler. Guide to use the SPEED sampler in ComfyUI is included in `comfyui/README.md`.
 - `speed-generator/`: skill directory for coding agents such as Claude Code or Codex. It contains `SKILL.md` and a `scripts/` directory that can be used by agents directly. Move this folder to the `skills` directory of the coding agent.
 
 ## Setup
