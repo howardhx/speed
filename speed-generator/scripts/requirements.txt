@@ -1,0 +1,25 @@
+# Dependencies for training-free inference.
+
+# Core
+torch>=2.1
+numpy>=1.23
+scipy>=1.10
+PyWavelets>=1.4
+PyYAML>=6.0
+omegaconf>=2.3
+einops>=0.7
+Pillow>=10.0
+tqdm>=4.65
+
+# Latent image (FLUX.1-dev)
+diffusers>=0.30
+transformers>=4.40
+accelerate>=0.30
+sentencepiece
+
+# Latent video (WAN 2.1)
+imageio>=2.31
+imageio-ffmpeg>=0.4
+
+# PixelGen and WAN must be cloned separately and added via environment variables.
+# Additionally, please install the requirements from the source clones of PixelGen and WAN

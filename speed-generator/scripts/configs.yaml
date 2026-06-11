@@ -1,0 +1,59 @@
+# Configuration for training-free Spectral Progressive Diffusion inference.
+#
+# Path placeholders of the form ${ENV_VAR} are expanded against the process
+# environment at load time (see utils.load_config). CLI flags override the
+# `defaults` block; the static fields (paths, power_spectrum) are intentionally
+# not overridable.
+#
+# Power-spectrum coefficients (A, beta) parameterize the radial fit
+#     P(omega) = A * |omega|^(-beta)
+# used to compute delta-optimal transition times.
+
+flux:
+  # FLUX.1-dev latent T2I (used by latent_image_gen.py).
+  checkpoint_dir: ${FLUX_DIR}
+  # Model defaults
+  latent_channels: 16
+  vae_downscale: 8
+  power_spectrum:
+    A: 203.615097
+    beta: 1.915461
+  defaults:
+    n_steps: 50
+    guidance: 3.5
+    height: 1024
+    width: 1024
+
+pixelgen:
+  # PixelGen XXL pixel-space T2I (used by pixel_image_gen.py).
+  checkpoint_path: ${PIXELGEN_CKPT}
+  config_path: ${PIXELGEN_CONFIG}
+  # Model defaults
+  power_spectrum:
+    A: 3745.46
+    beta: 2.4493
+  defaults:
+    n_steps: 25
+    guidance: 4.0
+    timeshift: 3.0
+    height: 512
+    width: 512
+    neg_prompt: "Unrealistic, JPEG artifacts."
+
+wan21:
+  # WAN 2.1 T2V-1.3B latent video (used by latent_video_gen.py).
+  checkpoint_dir: ${WAN_CKPT}
+  repo_path: ${WAN_PATH}
+  # Model defaults
+  latent_channels: 16
+  vae_downscale: 8
+  power_spectrum:
+    A: 219.484718
+    beta: 2.422687
+  defaults:
+    n_steps: 50
+    guidance: 5.0
+    shift: 5.0
+    height: 720
+    width: 1280
+    num_frames: 81
