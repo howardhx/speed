@@ -1,6 +1,6 @@
 """Training-free Spectral Progressive Diffusion inference for pixel-space image generation using PixelGen.
 
-Runs PixelGen directly in pixel space with progressive spatial scales. 
+Runs PixelGen directly in pixel space with progressive spatial resolution scales. 
 
 Usage
 -----
@@ -296,7 +296,7 @@ def generate(
     - denoiser: PixelGen denoiser module.
     - cond: Conditional text embedding.
     - uncond: Unconditional text embedding.
-    - scales: Strictly increasing scale list ending at 1.0.
+    - scales: Strictly increasing resolution scale list ending at 1.0.
     - transition_times: Per-transition flow-matching times (length S-1).
     - transform: Spectral basis, one of ``'dct'``, ``'dwt'``, ``'fft'``.
     - height: Full image height in pixels (must equal width).
@@ -459,6 +459,7 @@ def main() -> None:
         format="%(asctime)s  %(name)s  %(message)s",
     )
 
+    # Config loading
     cfg = load_config(args.config, "pixelgen")
     defaults = cfg["defaults"]
     n_steps = args.n_steps if args.n_steps is not None else defaults["n_steps"]
@@ -483,6 +484,7 @@ def main() -> None:
         cfg["checkpoint_path"], cfg["config_path"], args.device,
     )
 
+    # Generation
     for p_idx, prompt in enumerate(prompts):
         with torch.no_grad(), torch.autocast(device_type="cuda", dtype=torch.bfloat16):
             cond, uncond = conditioner([prompt], {"negative_prompt": neg_prompt})
@@ -497,6 +499,8 @@ def main() -> None:
             progress_desc="denoising" if args.progress else None,
         )
         out_path = os.path.join(args.save_dir, f"p{p_idx:04d}.png")
+
+        # Save
         decode_and_save(vae, samples, out_path)
         print(out_path)
 
