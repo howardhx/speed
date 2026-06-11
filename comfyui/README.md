@@ -1,7 +1,6 @@
 # Sampler SPEED for ComfyUI
 
-This custom sampler runs Spectral Progressive Diffusion on top of ComfyUI
-k-diffusion samplers. The trajectory is segmented at each resolution
+This custom sampler runs Spectral Progressive Diffusion on top of ComfyUI samplers. The trajectory is segmented at each resolution
 transition; between segments the latent is spectrally expanded and the
 flow-matching time is aligned. Currently PixelGen is not supported. 
 
@@ -43,20 +42,36 @@ ComfyUI's `requirements.txt`), not the `speed/` inference env.
 Wire `Sampler SPEED` to `SamplerCustomAdvanced` like any other custom sampler.
 ComfyUI's noise, scheduler, and model loaders feed in unchanged.
 
-### FLUX Example
+### FLUX.1-dev Example
+
+`Sampler SPEED` drops into a standard FLUX.1-dev `SamplerCustomAdvanced` graph:
 
 ```text
-KSamplerScheduler  ->  Sampler SPEED  ->  SamplerCustomAdvanced
-                        transform    = dct
-                        mode         = delta_optimal
-                        model_preset = flux
-                        scales       = 0.5,1.0
-                        delta        = 0.01
-                        base_sampler = euler
+UNETLoader (flux1-dev) ──┬─────────────────────► BasicGuider ─┐
+DualCLIPLoader → CLIPTextEncode → FluxGuidance ──┘             │
+RandomNoise ──────────────────────────────────────────────────┤
+BasicScheduler (model, steps) ──────────► SIGMAS ─────────────┤──► SamplerCustomAdvanced
+Sampler SPEED ──────────────────────────► SAMPLER ────────────┤        │
+EmptySD3LatentImage ──────────────────────────────────────────┘        ▼
+                                                          VAEDecode → SaveImage
+
+Sampler SPEED settings:
+  base_sampler = euler   transform = dct      mode = delta_optimal
+  model_preset = flux    scales = 0.5,1.0     delta = 0.01
 ```
 
 This matches the default two-stage FLUX configuration in
-`speed/latent_image_gen.py`.
+`speed/latent_image_gen.py` (`scales = 0.5,1.0`).
+
+A ready-to-run, headless version of exactly this graph lives next to this file:
+`workflow_flux_api.json` (API-format) plus `run_workflow.py`, which POSTs it to
+a running ComfyUI server and waits for the image — no UI building required:
+
+```bash
+# with ComfyUI running on :8188
+python run_workflow.py --server http://127.0.0.1:8188 \
+                       --prompt "a corgi puppy sitting in a field" --seed 42
+```
 
 ### WAN 2.1
 
@@ -65,8 +80,11 @@ output. Use `model_preset = wan21`; the remaining settings work the same way.
 
 ## Notes
 
-- The starting latent is DCT-truncated down to `scales[0]` so the upstream
-  noise or image source can plug in unchanged.
+- Wire a normal **full-resolution** latent + noise (`EmptySD3LatentImage` +
+  `RandomNoise`), exactly like any other sampler — you do **not** build a
+  low-res latent for stage 0. The node DCT-truncates that incoming full-res
+  latent down to `scales[0]` (drop the high-frequency DCT coefficients, keep
+  the low-frequency top-left block) to begin the coarsest stage. 
 - For DWT, every consecutive `s_{i+1}/s_i` must equal 2. Use DCT or FFT for
   non-dyadic schedules.
 - After a transition, the transition sigma is patched to the aligned time and
