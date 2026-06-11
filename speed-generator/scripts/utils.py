@@ -95,7 +95,7 @@ def kappa(t: float, r: float) -> float:
 
     Args:
     - t: Flow-matching time at the resolution transition.
-    - r: Scale ratio ``s__{i + 1} / s_i`` of the transition.
+    - r: Scale ratio ``s_{i + 1} / s_i`` of the transition.
 
     Returns:
     - The state-rescaling factor ``kappa``.

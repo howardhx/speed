@@ -1,7 +1,7 @@
 """Training-free Spectral Progressive Diffusion inference for latent image
 generation using FLUX.1-dev.
 
-Runs FLUX-1.dev at at progressive spatial scales.
+Runs FLUX.1-dev at progressive spatial scales.
 
 Usage
 -----

@@ -7,7 +7,7 @@
 <sup>1</sup>Stanford University 
 </br>
 
-Official code for **Spectral Progressive Diffusion for Efficient Image and Video Generation**. Currently support training-free inference only.
+Official code for **Spectral Progressive Diffusion for Efficient Image and Video Generation**. Currently supports training-free inference only.
 
 ![plot](speed.jpeg)
 

@@ -95,7 +95,7 @@ def kappa(t: float, r: float) -> float:
 
     Args:
     - t: Flow-matching time at the resolution transition.
-    - r: Scale ratio ``s__{i + 1} / s_i`` of the transition.
+    - r: Scale ratio ``s_{i + 1} / s_i`` of the transition.
 
     Returns:
     - The state-rescaling factor ``kappa``.
@@ -310,7 +310,7 @@ def validate_scales(scales: Sequence[float]) -> None:
 
 
 def parse_scales(tokens, full_height: int) -> List[float]:
-    """Parse a CLI/UI scale spec into ``[s_1, ..., s_S = 1.0]``.
+    """Parse a scale spec into ``[s_1, ..., s_S = 1.0]``.
 
     Tokens may be space- or comma-separated and take any of three forms,
     freely mixed:
