@@ -3,18 +3,26 @@
 This custom sampler runs Spectral Progressive Diffusion on top of ComfyUI
 k-diffusion samplers. The trajectory is segmented at each resolution
 transition; between segments the latent is spectrally expanded and the
-flow-matching time is aligned.
+flow-matching time is aligned. Currently PixelGen is not supported. 
 
 ## Install
-
+Firstly, please ensure that the required dependencies for ComfyUI are installed. Then, link the folder:
 ```bash
 ln -s comfyui \
       /path/to/ComfyUI/custom_nodes/SPEED
+
+# Install the node's extra dependency into the ComfyUI environment.
+# (ComfyUI already ships torch, numpy, scipy, PyYAML and av; only PyWavelets
+# is additional, used by the `dwt` transform.)
+pip install -r /path/to/ComfyUI/custom_nodes/SPEED/requirements.txt
 ```
 
 Restart ComfyUI. The node appears under
 `sampling -> custom_sampling -> samplers` as **Sampler SPEED (Spectral
 Progressive Diffusion)**.
+
+This node runs inside ComfyUI's own Python environment (the one created from
+ComfyUI's `requirements.txt`), not the `speed/` inference env.
 
 ## Inputs
 

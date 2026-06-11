@@ -1,0 +1,8 @@
+# Extra dependencies for the SPEED ComfyUI node, on top of a standard ComfyUI
+# install. ComfyUI itself already provides torch, numpy, scipy, PyYAML, and av
+# (its own video dependency); PyWavelets is the only genuinely additional
+# package (used by the `dwt` transform). scipy and PyYAML are repeated here so
+# the node also works on a minimal ComfyUI build that trimmed them.
+PyWavelets>=1.4
+scipy>=1.10
+PyYAML>=6.0
