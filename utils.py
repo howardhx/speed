@@ -186,7 +186,7 @@ def _fft_expand_np(
         X_src = np.fft.fftshift(np.fft.fft2(x_np[idx], norm="ortho"))
         nr = rng.standard_normal((H_tgt, W_tgt)).astype(np.float32)
         ni = rng.standard_normal((H_tgt, W_tgt)).astype(np.float32)
-        X_big = np.fft.fftshift(t * (nr + 1j * ni) / np.sqrt(2.0))
+        X_big = np.fft.fftshift(t * (nr + 1j * ni))
         X_big[pad_h:pad_h + H_src, pad_w:pad_w + W_src] = X_src
         out[idx] = np.fft.ifft2(np.fft.ifftshift(X_big), norm="ortho").real.astype(np.float32)
     return out
